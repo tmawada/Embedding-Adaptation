@@ -1,0 +1,31 @@
+{
+  "split": "test",
+  "n_queries": 578,
+  "results": {
+    "1. Base BGE-M3 | formal query (upper bound)": {
+      "nDCG@10": 0.6166153126882364,
+      "MRR@10": 0.7248180644806937,
+      "Recall@100": 0.9393378920195531
+    },
+    "2. Base BGE-M3 | informal query (zero-shot)": {
+      "nDCG@10": 0.5373065924800561,
+      "MRR@10": 0.6391463448124343,
+      "Recall@100": 0.9002986488713138
+    },
+    "3. Query-DANN  | informal query (proposed)": {
+      "nDCG@10": 0.5412304995763371,
+      "MRR@10": 0.6385929862140929,
+      "Recall@100": 0.8773775196353056
+    },
+    "   Query-DANN  | formal query (robustness)": {
+      "nDCG@10": 0.5900241278412331,
+      "MRR@10": 0.6957536936343164,
+      "Recall@100": 0.9114770417971112
+    },
+    "   infonce_only | informal query": {
+      "nDCG@10": 0.5307667652965521,
+      "MRR@10": 0.6426367605865874,
+      "Recall@100": 0.871568627450981
+    }
+  }
+}

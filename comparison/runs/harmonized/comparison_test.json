@@ -1,0 +1,508 @@
+{
+  "split": "test",
+  "n_queries": 578,
+  "results": {
+    "BGE-M3 base - formal query (upper bound)": {
+      "nDCG@10": 0.6166153126882368,
+      "MRR@10": 0.7248180644806943,
+      "Recall@100": 0.939337892019553
+    },
+    "BGE-M3 base - informal query (zero-shot)": {
+      "nDCG@10": 0.5373065924800559,
+      "MRR@10": 0.6391463448124347,
+      "Recall@100": 0.9002986488713133
+    },
+    "BGE-M3 + LLM normalisation (gemini-3.5-flash-lite)": {
+      "nDCG@10": 0.6017266928358215,
+      "MRR@10": 0.7100634371395618,
+      "Recall@100": 0.9368800461361014
+    },
+    "Query-DANN v2 (adapter on base tower)": {
+      "nDCG@10": 0.5737962526236873,
+      "MRR@10": 0.6782508101279727,
+      "Recall@100": 0.9145314988740593
+    },
+    "Query distillation: score (adapter on base tower)": {
+      "nDCG@10": 0.5730026016640599,
+      "MRR@10": 0.6785034602076124,
+      "Recall@100": 0.9163597792058
+    },
+    "Query distillation: embed (adapter on base tower)": {
+      "nDCG@10": 0.5652334691015586,
+      "MRR@10": 0.67513868292415,
+      "Recall@100": 0.9117853023562367
+    },
+    "SAPT-reviews tower - informal query (no adapter)": {
+      "nDCG@10": 0.5351316604391531,
+      "MRR@10": 0.6377361729005329,
+      "Recall@100": 0.896533613445378
+    },
+    "SAPT-reviews tower - formal query": {
+      "nDCG@10": 0.6143281092298779,
+      "MRR@10": 0.7187860438292963,
+      "Recall@100": 0.9390207063217443
+    },
+    "SAPT-reviews + Query-DANN v2 (full stack)": {
+      "nDCG@10": 0.5757704887523201,
+      "MRR@10": 0.6831287416927556,
+      "Recall@100": 0.9110136211347283
+    },
+    "SAPT-reviews + distillation: score": {
+      "nDCG@10": 0.5693015482860168,
+      "MRR@10": 0.6767946394243972,
+      "Recall@100": 0.9098911133080685
+    },
+    "SAPT-queries tower - informal query (no adapter)": {
+      "nDCG@10": 0.5266170011971004,
+      "MRR@10": 0.6321634536167409,
+      "Recall@100": 0.8969469160213105
+    },
+    "SAPT-queries tower - formal query": {
+      "nDCG@10": 0.6181542298271989,
+      "MRR@10": 0.7253515131542813,
+      "Recall@100": 0.939866534849234
+    },
+    "SAPT-queries + Query-DANN v2 (full stack)": {
+      "nDCG@10": 0.5754430723137949,
+      "MRR@10": 0.6785007140110946,
+      "Recall@100": 0.9153512385346296
+    },
+    "SAPT-queries + distillation: score": {
+      "nDCG@10": 0.5726513613917524,
+      "MRR@10": 0.677641154501016,
+      "Recall@100": 0.9153752677541604
+    }
+  },
+  "significance": {
+    "BGE-M3 + LLM normalisation (gemini-3.5-flash-lite) vs zero-shot": {
+      "nDCG@10": {
+        "diff": 0.06442010035576562,
+        "ci95_low": 0.04741497789161925,
+        "ci95_high": 0.08123740185886175,
+        "p": 0.000999000999000999
+      },
+      "MRR@10": {
+        "diff": 0.07091709232712694,
+        "ci95_low": 0.04742116699621025,
+        "ci95_high": 0.09370782871972319,
+        "p": 0.000999000999000999
+      },
+      "Recall@100": {
+        "diff": 0.03658139726478827,
+        "ci95_low": 0.02419678900972154,
+        "ci95_high": 0.04950372796177294,
+        "p": 0.000999000999000999
+      }
+    },
+    "Query-DANN v2 (adapter on base tower) vs zero-shot": {
+      "nDCG@10": {
+        "diff": 0.03648966014363146,
+        "ci95_low": 0.023220386368715783,
+        "ci95_high": 0.048727000144042965,
+        "p": 0.000999000999000999
+      },
+      "MRR@10": {
+        "diff": 0.03910446531553798,
+        "ci95_low": 0.022404157741527982,
+        "ci95_high": 0.05656373578843302,
+        "p": 0.000999000999000999
+      },
+      "Recall@100": {
+        "diff": 0.014232850002746196,
+        "ci95_low": 0.0028656389026198714,
+        "ci95_high": 0.025768317130773877,
+        "p": 0.01098901098901099
+      }
+    },
+    "Query distillation: score (adapter on base tower) vs zero-shot": {
+      "nDCG@10": {
+        "diff": 0.035696009184003966,
+        "ci95_low": 0.024719646893955494,
+        "ci95_high": 0.04641658387612869,
+        "p": 0.000999000999000999
+      },
+      "MRR@10": {
+        "diff": 0.03935711539517768,
+        "ci95_low": 0.02476293458559894,
+        "ci95_high": 0.05520659979678145,
+        "p": 0.000999000999000999
+      },
+      "Recall@100": {
+        "diff": 0.016061130334486737,
+        "ci95_low": 0.008070934256055363,
+        "ci95_high": 0.023923113362992254,
+        "p": 0.000999000999000999
+      }
+    },
+    "Query distillation: embed (adapter on base tower) vs zero-shot": {
+      "nDCG@10": {
+        "diff": 0.027926876621502637,
+        "ci95_low": 0.016824060639330642,
+        "ci95_high": 0.038954903360994504,
+        "p": 0.000999000999000999
+      },
+      "MRR@10": {
+        "diff": 0.035992338111715275,
+        "ci95_low": 0.020709840308672487,
+        "ci95_high": 0.05254108996539793,
+        "p": 0.000999000999000999
+      },
+      "Recall@100": {
+        "diff": 0.01148665348492338,
+        "ci95_low": 0.0036280688746086662,
+        "ci95_high": 0.020022244191794363,
+        "p": 0.01098901098901099
+      }
+    },
+    "SAPT-reviews tower - informal query (no adapter) vs zero-shot": {
+      "nDCG@10": {
+        "diff": -0.0021749320409027917,
+        "ci95_low": -0.007325033176127025,
+        "ci95_high": 0.0033770935659483397,
+        "p": 0.4325674325674326
+      },
+      "MRR@10": {
+        "diff": -0.0014101719119020148,
+        "ci95_low": -0.009105941396166311,
+        "ci95_high": 0.006683006535947707,
+        "p": 0.7462537462537463
+      },
+      "Recall@100": {
+        "diff": -0.0037650354259350805,
+        "ci95_low": -0.009915039545229857,
+        "ci95_high": 0.002341475806008678,
+        "p": 0.25374625374625376
+      }
+    },
+    "SAPT-reviews tower - formal query vs zero-shot": {
+      "nDCG@10": {
+        "diff": 0.07702151674982198,
+        "ci95_low": 0.061208891837833984,
+        "ci95_high": 0.09310102471289479,
+        "p": 0.000999000999000999
+      },
+      "MRR@10": {
+        "diff": 0.07963969901686166,
+        "ci95_low": 0.05779269305761521,
+        "ci95_high": 0.10083484374141814,
+        "p": 0.000999000999000999
+      },
+      "Recall@100": {
+        "diff": 0.038722057450431155,
+        "ci95_low": 0.027374515982863733,
+        "ci95_high": 0.0504731353325644,
+        "p": 0.000999000999000999
+      }
+    },
+    "SAPT-reviews + Query-DANN v2 (full stack) vs zero-shot": {
+      "nDCG@10": {
+        "diff": 0.03846389627226422,
+        "ci95_low": 0.025157993703190395,
+        "ci95_high": 0.05113454283744489,
+        "p": 0.000999000999000999
+      },
+      "MRR@10": {
+        "diff": 0.043982396880320754,
+        "ci95_low": 0.026650687235678584,
+        "ci95_high": 0.06181542469929148,
+        "p": 0.000999000999000999
+      },
+      "Recall@100": {
+        "diff": 0.010714972263415168,
+        "ci95_low": -0.0005379798978414906,
+        "ci95_high": 0.02249085173285,
+        "p": 0.06593406593406594
+      }
+    },
+    "SAPT-reviews + distillation: score vs zero-shot": {
+      "nDCG@10": {
+        "diff": 0.03199495580596086,
+        "ci95_low": 0.020276812444718906,
+        "ci95_high": 0.04327375076138702,
+        "p": 0.000999000999000999
+      },
+      "MRR@10": {
+        "diff": 0.03764829461196244,
+        "ci95_low": 0.021823096885813152,
+        "ci95_high": 0.05446728936672708,
+        "p": 0.000999000999000999
+      },
+      "Recall@100": {
+        "diff": 0.009592464436755092,
+        "ci95_low": 0.001100160652496292,
+        "ci95_high": 0.018460035975174382,
+        "p": 0.029970029970029972
+      }
+    },
+    "SAPT-queries tower - informal query (no adapter) vs zero-shot": {
+      "nDCG@10": {
+        "diff": -0.010689591282955383,
+        "ci95_low": -0.017124637772336453,
+        "ci95_high": -0.004659252351889715,
+        "p": 0.000999000999000999
+      },
+      "MRR@10": {
+        "diff": -0.006982891195693964,
+        "ci95_low": -0.015575156533201517,
+        "ci95_high": 0.001082567831053988,
+        "p": 0.11188811188811189
+      },
+      "Recall@100": {
+        "diff": -0.0033517328500027458,
+        "ci95_low": -0.007711113857307629,
+        "ci95_high": 0.0008516298676333282,
+        "p": 0.11488511488511488
+      }
+    },
+    "SAPT-queries tower - formal query vs zero-shot": {
+      "nDCG@10": {
+        "diff": 0.08084763734714298,
+        "ci95_low": 0.06533561850945342,
+        "ci95_high": 0.09688907471914635,
+        "p": 0.000999000999000999
+      },
+      "MRR@10": {
+        "diff": 0.08620516834184655,
+        "ci95_low": 0.06530470766738068,
+        "ci95_high": 0.10714342354588895,
+        "p": 0.000999000999000999
+      },
+      "Recall@100": {
+        "diff": 0.039567885977920575,
+        "ci95_low": 0.02799663247652002,
+        "ci95_high": 0.05119988191354973,
+        "p": 0.000999000999000999
+      }
+    },
+    "SAPT-queries + Query-DANN v2 (full stack) vs zero-shot": {
+      "nDCG@10": {
+        "diff": 0.03813647983373895,
+        "ci95_low": 0.024790426223074754,
+        "ci95_high": 0.05102871789698813,
+        "p": 0.000999000999000999
+      },
+      "MRR@10": {
+        "diff": 0.03935436919865986,
+        "ci95_low": 0.021307309688581313,
+        "ci95_high": 0.056546314604273076,
+        "p": 0.000999000999000999
+      },
+      "Recall@100": {
+        "diff": 0.015052589663316305,
+        "ci95_low": 0.0029997734387872807,
+        "ci95_high": 0.02787494164332399,
+        "p": 0.017982017982017984
+      }
+    },
+    "SAPT-queries + distillation: score vs zero-shot": {
+      "nDCG@10": {
+        "diff": 0.03534476891169646,
+        "ci95_low": 0.024177486151535057,
+        "ci95_high": 0.04628865532383261,
+        "p": 0.000999000999000999
+      },
+      "MRR@10": {
+        "diff": 0.038494809688581315,
+        "ci95_low": 0.022261132394134124,
+        "ci95_high": 0.054289558960839236,
+        "p": 0.000999000999000999
+      },
+      "Recall@100": {
+        "diff": 0.015076618882847259,
+        "ci95_low": 0.0069995056846267915,
+        "ci95_high": 0.023734449662217823,
+        "p": 0.001998001998001998
+      }
+    },
+    "BGE-M3 + LLM normalisation (gemini-3.5-flash-lite) vs Query-DANN v2 (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": 0.02793044021213416,
+        "ci95_low": 0.01406614427417306,
+        "ci95_high": 0.04190057384660005,
+        "p": 0.000999000999000999
+      }
+    },
+    "BGE-M3 + LLM normalisation (gemini-3.5-flash-lite) vs Query distillation: score (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": 0.02872409117176165,
+        "ci95_low": 0.015343429462763783,
+        "ci95_high": 0.04220866866266246,
+        "p": 0.000999000999000999
+      }
+    },
+    "BGE-M3 + LLM normalisation (gemini-3.5-flash-lite) vs Query distillation: embed (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": 0.03649322373426298,
+        "ci95_low": 0.021515983080331147,
+        "ci95_high": 0.05183282060179142,
+        "p": 0.000999000999000999
+      }
+    },
+    "SAPT-reviews tower - informal query (no adapter) vs Query-DANN v2 (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": -0.03866459218453425,
+        "ci95_low": -0.05111372110279396,
+        "ci95_high": -0.02483253905204972,
+        "p": 0.000999000999000999
+      }
+    },
+    "SAPT-reviews tower - informal query (no adapter) vs Query distillation: score (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": -0.03787094122490676,
+        "ci95_low": -0.0479532412145824,
+        "ci95_high": -0.026579131999555923,
+        "p": 0.000999000999000999
+      }
+    },
+    "SAPT-reviews tower - informal query (no adapter) vs Query distillation: embed (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": -0.030101808662405426,
+        "ci95_low": -0.040639728589946376,
+        "ci95_high": -0.019217983044182197,
+        "p": 0.000999000999000999
+      }
+    },
+    "SAPT-reviews + Query-DANN v2 (full stack) vs Query-DANN v2 (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": 0.001974236128632768,
+        "ci95_low": -0.002416984391147344,
+        "ci95_high": 0.006119403236313746,
+        "p": 0.36863136863136864
+      }
+    },
+    "SAPT-reviews + Query-DANN v2 (full stack) vs Query distillation: score (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": 0.0027678870882602603,
+        "ci95_low": -0.005773588319252809,
+        "ci95_high": 0.01148488682256618,
+        "p": 0.5424575424575424
+      }
+    },
+    "SAPT-reviews + Query-DANN v2 (full stack) vs Query distillation: embed (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": 0.010537019650761589,
+        "ci95_low": -0.0002411836330115877,
+        "ci95_high": 0.021369142243303118,
+        "p": 0.054945054945054944
+      }
+    },
+    "SAPT-reviews + distillation: score vs Query-DANN v2 (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": -0.004494704337670604,
+        "ci95_low": -0.014615181986891513,
+        "ci95_high": 0.006014118025271904,
+        "p": 0.3936063936063936
+      }
+    },
+    "SAPT-reviews + distillation: score vs Query distillation: score (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": -0.003701053378043111,
+        "ci95_low": -0.008603822822701591,
+        "ci95_high": 0.0017731994740173593,
+        "p": 0.16883116883116883
+      }
+    },
+    "SAPT-reviews + distillation: score vs Query distillation: embed (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": 0.004068079184458217,
+        "ci95_low": -0.004547043732322237,
+        "ci95_high": 0.0122558235575391,
+        "p": 0.34065934065934067
+      }
+    },
+    "SAPT-queries tower - informal query (no adapter) vs Query-DANN v2 (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": -0.04717925142658684,
+        "ci95_low": -0.06107431044567639,
+        "ci95_high": -0.03266190966456798,
+        "p": 0.000999000999000999
+      }
+    },
+    "SAPT-queries tower - informal query (no adapter) vs Query distillation: score (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": -0.046385600466959345,
+        "ci95_low": -0.058141707755442744,
+        "ci95_high": -0.03447433531116618,
+        "p": 0.000999000999000999
+      }
+    },
+    "SAPT-queries tower - informal query (no adapter) vs Query distillation: embed (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": -0.03861646790445802,
+        "ci95_low": -0.05071847821311985,
+        "ci95_high": -0.02643511677013472,
+        "p": 0.000999000999000999
+      }
+    },
+    "SAPT-queries + Query-DANN v2 (full stack) vs Query-DANN v2 (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": 0.0016468196901074893,
+        "ci95_low": -0.003447394949148644,
+        "ci95_high": 0.0066142347012233295,
+        "p": 0.4995004995004995
+      }
+    },
+    "SAPT-queries + Query-DANN v2 (full stack) vs Query distillation: score (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": 0.0024404706497349834,
+        "ci95_low": -0.0068341212786477545,
+        "ci95_high": 0.012161000157621324,
+        "p": 0.6043956043956044
+      }
+    },
+    "SAPT-queries + Query-DANN v2 (full stack) vs Query distillation: embed (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": 0.010209603212236311,
+        "ci95_low": -0.0006211676658513895,
+        "ci95_high": 0.021767507629238746,
+        "p": 0.07792207792207792
+      }
+    },
+    "SAPT-queries + distillation: score vs Query-DANN v2 (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": -0.0011448912319350023,
+        "ci95_low": -0.01100390134343134,
+        "ci95_high": 0.008564284299113939,
+        "p": 0.8161838161838162
+      }
+    },
+    "SAPT-queries + distillation: score vs Query distillation: score (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": -0.00035124027230751053,
+        "ci95_low": -0.005960815253652078,
+        "ci95_high": 0.005524308854910601,
+        "p": 0.9120879120879121
+      }
+    },
+    "SAPT-queries + distillation: score vs Query distillation: embed (adapter on base tower)": {
+      "nDCG@10": {
+        "diff": 0.007417892290193818,
+        "ci95_low": -0.0009232727025224816,
+        "ci95_high": 0.015597683387064822,
+        "p": 0.07892107892107893
+      }
+    },
+    "SAPT-reviews + Query-DANN v2 (full stack) vs SAPT-reviews tower - informal query (no adapter)": {
+      "nDCG@10": {
+        "diff": 0.040638828313167015,
+        "ci95_low": 0.027163866169330798,
+        "ci95_high": 0.05269825180735667,
+        "p": 0.000999000999000999
+      }
+    },
+    "SAPT-queries + Query-DANN v2 (full stack) vs SAPT-queries tower - informal query (no adapter)": {
+      "nDCG@10": {
+        "diff": 0.04882607111669433,
+        "ci95_low": 0.03463445038964885,
+        "ci95_high": 0.06287481653416938,
+        "p": 0.000999000999000999
+      }
+    }
+  },
+  "notes": {
+    "llm_model": "gemini-3.5-flash-lite",
+    "SAPT-reviews_dann_ckpt": "comparison/runs/harmonized/sapt_reviews/query_dann_v2/g1.0/best",
+    "SAPT-queries_dann_ckpt": "comparison/runs/harmonized/sapt_queries/query_dann_v2/g1.0/best"
+  },
+  "bootstrap_samples": 1000
+}

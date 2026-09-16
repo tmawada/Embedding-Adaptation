@@ -1,0 +1,319 @@
+{
+  "split": "test",
+  "n_queries": 578,
+  "results": {
+    "BGE-M3 base | formal query (upper bound)": {
+      "nDCG@10": 0.6166153126882368,
+      "MRR@10": 0.7248180644806943,
+      "Recall@100": 0.939337892019553
+    },
+    "BGE-M3 base | informal query (zero-shot)": {
+      "nDCG@10": 0.5373065924800559,
+      "MRR@10": 0.6391463448124347,
+      "Recall@100": 0.9002986488713133
+    },
+    "BGE-M3 + LLM normalisation (gemini-3.5-flash-lite)": {
+      "nDCG@10": 0.6017266928358215,
+      "MRR@10": 0.7100634371395618,
+      "Recall@100": 0.9368800461361014
+    },
+    "Query-DANN v2 (adapter, adversarial)": {
+      "nDCG@10": 0.5747930654702186,
+      "MRR@10": 0.6846748503322898,
+      "Recall@100": 0.9083559894546054
+    },
+    "Query distillation: score (adapter)": {
+      "nDCG@10": 0.5768382610739287,
+      "MRR@10": 0.682570577250508,
+      "Recall@100": 0.9141683143845774
+    },
+    "Query distillation: embed (adapter)": {
+      "nDCG@10": 0.5671734440844514,
+      "MRR@10": 0.6770129620475641,
+      "Recall@100": 0.913531883341572
+    },
+    "TSDAE-DAPT tower | informal query (no adapter)": {
+      "nDCG@10": 0.45547828449272754,
+      "MRR@10": 0.5476334651507662,
+      "Recall@100": 0.8390035425935081
+    },
+    "TSDAE-DAPT tower | formal query": {
+      "nDCG@10": 0.5393767883269239,
+      "MRR@10": 0.643691986598561,
+      "Recall@100": 0.8958134234085792
+    },
+    "TSDAE-DAPT + Query-DANN v2 (full stack)": {
+      "nDCG@10": 0.5205356833931089,
+      "MRR@10": 0.6248771077058275,
+      "Recall@100": 0.861291673532158
+    },
+    "TSDAE-DAPT + distillation: score": {
+      "nDCG@10": 0.4985401958147066,
+      "MRR@10": 0.6018825177129676,
+      "Recall@100": 0.8523102378206184
+    }
+  },
+  "significance": {
+    "BGE-M3 + LLM normalisation (gemini-3.5-flash-lite) vs zero-shot": {
+      "nDCG@10": {
+        "diff": 0.06442010035576562,
+        "ci95_low": 0.04741497789161925,
+        "ci95_high": 0.08123740185886175,
+        "p": 0.000999000999000999
+      },
+      "MRR@10": {
+        "diff": 0.07091709232712694,
+        "ci95_low": 0.04742116699621025,
+        "ci95_high": 0.09370782871972319,
+        "p": 0.000999000999000999
+      },
+      "Recall@100": {
+        "diff": 0.03658139726478827,
+        "ci95_low": 0.02419678900972154,
+        "ci95_high": 0.04950372796177294,
+        "p": 0.000999000999000999
+      }
+    },
+    "Query-DANN v2 (adapter, adversarial) vs zero-shot": {
+      "nDCG@10": {
+        "diff": 0.03748647299016269,
+        "ci95_low": 0.022361081425520308,
+        "ci95_high": 0.052254136381336413,
+        "p": 0.000999000999000999
+      },
+      "MRR@10": {
+        "diff": 0.045528505519855,
+        "ci95_low": 0.024855584390618995,
+        "ci95_high": 0.06524439432635798,
+        "p": 0.000999000999000999
+      },
+      "Recall@100": {
+        "diff": 0.00805734058329214,
+        "ci95_low": -0.004726942247487231,
+        "ci95_high": 0.02134373111989894,
+        "p": 0.22077922077922077
+      }
+    },
+    "Query distillation: score (adapter) vs zero-shot": {
+      "nDCG@10": {
+        "diff": 0.0395316685938727,
+        "ci95_low": 0.028834613897706297,
+        "ci95_high": 0.050071005549835484,
+        "p": 0.000999000999000999
+      },
+      "MRR@10": {
+        "diff": 0.043424232438073265,
+        "ci95_low": 0.02721805143626078,
+        "ci95_high": 0.05914641346734771,
+        "p": 0.000999000999000999
+      },
+      "Recall@100": {
+        "diff": 0.013869665513264127,
+        "ci95_low": 0.004867255725819739,
+        "ci95_high": 0.02275343961113857,
+        "p": 0.001998001998001998
+      }
+    },
+    "Query distillation: embed (adapter) vs zero-shot": {
+      "nDCG@10": {
+        "diff": 0.029866851604395582,
+        "ci95_low": 0.018626290500129355,
+        "ci95_high": 0.041232239848726523,
+        "p": 0.000999000999000999
+      },
+      "MRR@10": {
+        "diff": 0.03786661723512934,
+        "ci95_low": 0.02221801710880431,
+        "ci95_high": 0.054566564370846365,
+        "p": 0.000999000999000999
+      },
+      "Recall@100": {
+        "diff": 0.013233234470258691,
+        "ci95_low": 0.005431393145493491,
+        "ci95_high": 0.02156919385401219,
+        "p": 0.001998001998001998
+      }
+    },
+    "TSDAE-DAPT tower | informal query (no adapter) vs zero-shot": {
+      "nDCG@10": {
+        "diff": -0.08182830798732846,
+        "ci95_low": -0.102402873701955,
+        "ci95_high": -0.06317531382980818,
+        "p": 0.000999000999000999
+      },
+      "MRR@10": {
+        "diff": -0.09151287966166859,
+        "ci95_low": -0.11575293843027408,
+        "ci95_high": -0.06530747102762675,
+        "p": 0.000999000999000999
+      },
+      "Recall@100": {
+        "diff": -0.061295106277805246,
+        "ci95_low": -0.07975481614214315,
+        "ci95_high": -0.044129764650958435,
+        "p": 0.000999000999000999
+      }
+    },
+    "TSDAE-DAPT tower | formal query vs zero-shot": {
+      "nDCG@10": {
+        "diff": 0.0020701958468679785,
+        "ci95_low": -0.019005690561447568,
+        "ci95_high": 0.022203464120164412,
+        "p": 0.8571428571428571
+      },
+      "MRR@10": {
+        "diff": 0.004545641786126217,
+        "ci95_low": -0.024025975586312958,
+        "ci95_high": 0.03234202504531225,
+        "p": 0.7572427572427572
+      },
+      "Recall@100": {
+        "diff": -0.004485225462734115,
+        "ci95_low": -0.019936614351623,
+        "ci95_high": 0.010229255918053494,
+        "p": 0.5734265734265734
+      }
+    },
+    "TSDAE-DAPT + Query-DANN v2 (full stack) vs zero-shot": {
+      "nDCG@10": {
+        "diff": -0.01677090908694705,
+        "ci95_low": -0.0364779767100512,
+        "ci95_high": 0.0034990905405105715,
+        "p": 0.11488511488511488
+      },
+      "MRR@10": {
+        "diff": -0.014269237106607354,
+        "ci95_low": -0.03938828472565496,
+        "ci95_high": 0.011788838084253303,
+        "p": 0.30569430569430567
+      },
+      "Recall@100": {
+        "diff": -0.039006975339155266,
+        "ci95_low": -0.058469476025704396,
+        "ci95_high": -0.020023582962596802,
+        "p": 0.000999000999000999
+      }
+    },
+    "TSDAE-DAPT + distillation: score vs zero-shot": {
+      "nDCG@10": {
+        "diff": -0.038766396665349305,
+        "ci95_low": -0.05913514822912415,
+        "ci95_high": -0.019252914207235492,
+        "p": 0.000999000999000999
+      },
+      "MRR@10": {
+        "diff": -0.03726382709946724,
+        "ci95_low": -0.06170537087383973,
+        "ci95_high": -0.010046530867248873,
+        "p": 0.008991008991008992
+      },
+      "Recall@100": {
+        "diff": -0.04798841105069479,
+        "ci95_low": -0.06498007291151756,
+        "ci95_high": -0.03021847709672104,
+        "p": 0.000999000999000999
+      }
+    },
+    "BGE-M3 + LLM normalisation (gemini-3.5-flash-lite) vs Query-DANN v2 (adapter, adversarial)": {
+      "nDCG@10": {
+        "diff": 0.02693362736560293,
+        "ci95_low": 0.011571032102626937,
+        "ci95_high": 0.04096321883969756,
+        "p": 0.001998001998001998
+      }
+    },
+    "BGE-M3 + LLM normalisation (gemini-3.5-flash-lite) vs Query distillation: score (adapter)": {
+      "nDCG@10": {
+        "diff": 0.02488843176189292,
+        "ci95_low": 0.011062055354472657,
+        "ci95_high": 0.038181420649285765,
+        "p": 0.000999000999000999
+      }
+    },
+    "BGE-M3 + LLM normalisation (gemini-3.5-flash-lite) vs Query distillation: embed (adapter)": {
+      "nDCG@10": {
+        "diff": 0.03455324875137004,
+        "ci95_low": 0.01899603767265636,
+        "ci95_high": 0.04960466595948337,
+        "p": 0.000999000999000999
+      }
+    },
+    "BGE-M3 + LLM normalisation (gemini-3.5-flash-lite) vs TSDAE-DAPT tower | informal query (no adapter)": {
+      "nDCG@10": {
+        "diff": 0.14624840834309408,
+        "ci95_low": 0.12618548855670725,
+        "ci95_high": 0.16583023280393822,
+        "p": 0.000999000999000999
+      }
+    },
+    "TSDAE-DAPT + Query-DANN v2 (full stack) vs Query-DANN v2 (adapter, adversarial)": {
+      "nDCG@10": {
+        "diff": -0.05425738207710974,
+        "ci95_low": -0.07115127306411223,
+        "ci95_high": -0.03810465353077227,
+        "p": 0.000999000999000999
+      }
+    },
+    "TSDAE-DAPT + Query-DANN v2 (full stack) vs Query distillation: score (adapter)": {
+      "nDCG@10": {
+        "diff": -0.05630257768081974,
+        "ci95_low": -0.07531068933455823,
+        "ci95_high": -0.03688958056603965,
+        "p": 0.000999000999000999
+      }
+    },
+    "TSDAE-DAPT + Query-DANN v2 (full stack) vs Query distillation: embed (adapter)": {
+      "nDCG@10": {
+        "diff": -0.046637760691342636,
+        "ci95_low": -0.0661378323167496,
+        "ci95_high": -0.02665758031611595,
+        "p": 0.000999000999000999
+      }
+    },
+    "TSDAE-DAPT + Query-DANN v2 (full stack) vs TSDAE-DAPT tower | informal query (no adapter)": {
+      "nDCG@10": {
+        "diff": 0.0650573989003814,
+        "ci95_low": 0.0493710233741072,
+        "ci95_high": 0.07993707931839462,
+        "p": 0.000999000999000999
+      }
+    },
+    "TSDAE-DAPT + distillation: score vs Query-DANN v2 (adapter, adversarial)": {
+      "nDCG@10": {
+        "diff": -0.07625286965551199,
+        "ci95_low": -0.09384564450208603,
+        "ci95_high": -0.05825507024688354,
+        "p": 0.000999000999000999
+      }
+    },
+    "TSDAE-DAPT + distillation: score vs Query distillation: score (adapter)": {
+      "nDCG@10": {
+        "diff": -0.078298065259222,
+        "ci95_low": -0.0961653988697318,
+        "ci95_high": -0.059509496302434836,
+        "p": 0.000999000999000999
+      }
+    },
+    "TSDAE-DAPT + distillation: score vs Query distillation: embed (adapter)": {
+      "nDCG@10": {
+        "diff": -0.06863324826974489,
+        "ci95_low": -0.08873456056812651,
+        "ci95_high": -0.04917926444109061,
+        "p": 0.000999000999000999
+      }
+    },
+    "TSDAE-DAPT + distillation: score vs TSDAE-DAPT tower | informal query (no adapter)": {
+      "nDCG@10": {
+        "diff": 0.04306191132197915,
+        "ci95_low": 0.03187867530415085,
+        "ci95_high": 0.05424298178782666,
+        "p": 0.000999000999000999
+      }
+    }
+  },
+  "notes": {
+    "llm_model": "gemini-3.5-flash-lite",
+    "tsdae_dann_ckpt": "encoder_comparison/runs/tsdae_bge_m3/query_dann_v2/g0.5/best"
+  },
+  "bootstrap_samples": 1000
+}
