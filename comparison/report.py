@@ -62,6 +62,21 @@ def main():
     ap.add_argument("--tuned", action="store_true", help="Use the per-method-tuned checkpoints instead of harmonised")
     ap.add_argument("--rewrites_informal", default="llm_rewrite/cache/gemini-3.5-flash-lite_test.jsonl")
     ap.add_argument("--rewrites_formal", default="llm_rewrite/cache/gemini-3.5-flash-lite_test_formal.jsonl")
+    ap.add_argument("--sapt_variants", nargs="*", default=["reviews", "queries"], choices=["reviews", "queries"],
+                    help="Which SAPT towers to include: 'reviews' is the method (external informal corpus), "
+                         "'queries' is the data ablation")
+    ap.add_argument("--skip_default_adapters", action="store_true",
+                    help="Omit the default (bottleneck) Query-DANN / distillation rows on the base tower")
+    ap.add_argument("--skip_sapt_stacks", action="store_true",
+                    help="Keep SAPT tower rows but omit their default (bottleneck) Query-DANN stack rows")
+    ap.add_argument("--report_name", default=None, help="Output file tag (default: harmonized / tuned)")
+    ap.add_argument("--extra_tower", action="append", default=[],
+                    help="Extra rows on a chosen tower: 'Row name=base|reviews|queries=path/to/best' (repeatable)")
+    ap.add_argument("--extra", action="append", default=[],
+                    help="Extra adapter rows on the base tower: 'Row name=path/to/best' (repeatable)")
+    ap.add_argument("--llm_formal", default="original", choices=["original", "rewrite"],
+                    help="LLM normalisation row, formal column: 'original' = formal queries go to BGE-M3 unchanged "
+                         "(normalisation applies to informal queries only); 'rewrite' = formal queries are also rewritten")
     ap.add_argument("--bootstrap", type=int, default=1000)
     ap.add_argument("--out_dir", default=os.path.join(HERE, "runs", "harmonized"))
     args = ap.parse_args()
@@ -134,6 +149,8 @@ def main():
     llm = {}
     enc = None
     for kind, path in (("informal", args.rewrites_informal), ("formal", args.rewrites_formal)):
+        if kind == "formal" and args.llm_formal == "original":
+            continue  # formal queries are not rewritten
         p = abspath(path)
         if not os.path.exists(p):
             print(f"! no {kind} rewrites at {path}")
@@ -149,13 +166,16 @@ def main():
     if enc is not None:
         del enc
         torch.cuda.empty_cache()
+    if args.llm_formal == "original" and "informal" in llm:
+        llm["formal"] = base["formal"]  # formal column = the original formal query through base BGE-M3
     if len(llm) == 2:
         add("BGE-M3 + LLM normalisation", llm)
     elif llm:
         print("! LLM normalisation needs both formal and informal rewrites for the table")
 
-    for name, key in (("Query-DANN v2", "dann"), ("Query distillation (score)", "score"),
-                      ("Query distillation (embed)", "embed")):
+    for name, key in ([] if args.skip_default_adapters else
+                      (("Query-DANN v2", "dann"), ("Query distillation (score)", "score"),
+                       ("Query distillation (embed)", "embed"))):
         c = best_dann(ckpt[key])
         if c:
             a = load_adapter(c, device)
@@ -163,14 +183,36 @@ def main():
         else:
             print(f"! missing checkpoint for {name}")
 
-    for label, tkey, dkey in (("TSDAE-SAPT (reviews)", "reviews", "reviews_dann"),
-                              ("TSDAE-SAPT (task queries)", "queries", "queries_dann")):
+    for spec in args.extra:
+        name, path = spec.split("=", 1)
+        c = best_dann(path)
+        if c:
+            a = load_adapter(c, device)
+            add(name, {k: adapt(a, v) for k, v in base.items()})
+        else:
+            print(f"! missing checkpoint for {name} ({path})")
+
+    variants = [("TSDAE-SAPT (reviews)", "reviews", "reviews_dann"),
+                ("TSDAE-SAPT (task queries)", "queries", "queries_dann")]
+    for label, tkey, dkey in [v for v in variants if v[1] in args.sapt_variants]:
         vec = tower_vectors(towers[tkey])
         add(label, vec)
-        c = best_dann(ckpt[dkey])
+        c = None if args.skip_sapt_stacks else best_dann(ckpt[dkey])
         if vec and c:
             a = load_adapter(c, device)
             add(f"{label} + Query-DANN v2", {k: adapt(a, v) for k, v in vec.items()})
+
+    # extra rows attached to a specific tower (e.g. a pass-through adapter on a SAPT tower)
+    if args.extra_tower:
+        pool = {"base": base, "reviews": tower_vectors(towers["reviews"]), "queries": tower_vectors(towers["queries"])}
+        for spec in args.extra_tower:
+            name, tkey, path = spec.split("=", 2)
+            vec, c = pool.get(tkey), best_dann(path)
+            if vec is None or not c:
+                print(f"! skipping {name} (tower={tkey}, ckpt={path})")
+                continue
+            a = load_adapter(c, device)
+            add(name, {k: adapt(a, v) for k, v in vec.items()})
 
     order = ("Recall@100", "MRR@100", "nDCG@10")
     lines = [f"# Retrieval results — MIRACL-id {args.split} ({len(qids)} queries, {len(store.doc_ids):,} passages)",
@@ -204,7 +246,7 @@ def main():
 
     text = "\n".join(lines) + "\n"
     os.makedirs(args.out_dir, exist_ok=True)
-    tag = "tuned" if args.tuned else "harmonized"
+    tag = args.report_name or ("tuned" if args.tuned else "harmonized")
     with open(os.path.join(args.out_dir, f"report_{tag}_{args.split}.md"), "w") as f:
         f.write(text)
     with open(os.path.join(args.out_dir, f"report_{tag}_{args.split}.json"), "w") as f:

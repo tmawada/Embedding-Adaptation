@@ -196,7 +196,39 @@ class SanitizedDomainDiscriminator(DomainDiscriminator):
         return super().forward(z)
 
 
-ADAPTERS = {"zeroinit": ZeroInitQueryAdapter, "layernorm": QueryAdapter}
+class IdentityQueryAdapter(nn.Module):
+    """No adaptation at all (ablation: --use_adapter false).
+
+    Has no parameters, so with a frozen encoder nothing on the query side is trainable and the
+    pipeline reduces exactly to the base model. Useful as a lower bound / plumbing check.
+    """
+
+    def __init__(self, dim: int = EMB_DIM, bottleneck: int = 0, dropout: float = 0.0):
+        super().__init__()
+
+    def forward(self, z_in: torch.Tensor) -> torch.Tensor:
+        return F.normalize(z_in, dim=-1)
+
+
+class LinearQueryAdapter(nn.Module):
+    """Plain 1024x1024 linear map, initialised to the identity (ablation: --adapter linear).
+
+    Same interface as the bottleneck adapter but without the bottleneck, residual branch,
+    LayerNorm, GELU or dropout: isolates what the adapter architecture itself contributes.
+    """
+
+    def __init__(self, dim: int = EMB_DIM, bottleneck: int = 0, dropout: float = 0.0):
+        super().__init__()
+        self.proj = nn.Linear(dim, dim)
+        nn.init.eye_(self.proj.weight)
+        nn.init.zeros_(self.proj.bias)
+
+    def forward(self, z_in: torch.Tensor) -> torch.Tensor:
+        return F.normalize(self.proj(z_in), dim=-1)
+
+
+ADAPTERS = {"zeroinit": ZeroInitQueryAdapter, "layernorm": QueryAdapter,
+            "linear": LinearQueryAdapter, "identity": IdentityQueryAdapter}
 DISCRIMINATORS = {"sanitized": SanitizedDomainDiscriminator, "plain": DomainDiscriminator}
 
 

@@ -120,8 +120,8 @@ def main():
         else:
             print(f"! missing checkpoint {ckpt}")
 
-    variants = [("SAPT-reviews", args.sapt_reviews_cache, args.sapt_reviews_dann, args.sapt_reviews_distill),
-                ("SAPT-queries", args.sapt_queries_cache, args.sapt_queries_dann, args.sapt_queries_distill)]
+    variants = [("TSDAE-SAPT (reviews)", args.sapt_reviews_cache, args.sapt_reviews_dann, args.sapt_reviews_distill),
+                ("TSDAE-SAPT (task queries)", args.sapt_queries_cache, args.sapt_queries_dann, args.sapt_queries_distill)]
     for label, cache, dann_dir, distill_ckpt in variants:
         cache = abspath(cache)
         if not os.path.exists(os.path.join(cache, "informal_emb.npy")):
@@ -173,7 +173,7 @@ def main():
     heads = [(a, b) for a in results if a.startswith(("BGE-M3 + LLM", "SAPT")) and "- formal query" not in a
              for b in base_adapters]
     heads += [(f"{v} + Query-DANN v2 (full stack)", f"{v} tower - informal query (no adapter)")
-              for v in ("SAPT-reviews", "SAPT-queries")]
+              for v in ("TSDAE-SAPT (reviews)", "TSDAE-SAPT (task queries)")]
     heads = [(a, b) for a, b in heads if a in results and b in results]
     if heads:
         lines += ["", "## Head-to-head (nDCG@10)", "", "| A | B | A - B | p |", "|---|---|---|---|"]

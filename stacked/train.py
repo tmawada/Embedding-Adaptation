@@ -1,6 +1,9 @@
-"""Train the Query-DANN adapter + discriminator on cached frozen BGE-M3 embeddings.
+"""Stacked training: Query-DANN v2 + score distillation in ONE adapter (optionally on a TSDAE-SAPT tower).
 
-L_total = L_InfoNCE + gamma * L_domain + mu * L_preserve
+L_total = L_InfoNCE + gamma * L_domain + mu * L_preserve + kd_weight * L_KD
+  L_KD = KL( softmax(z_formal @ C_k / kd_tau) || softmax(A(z_informal) @ C_k / kd_tau) ), C_k = the teacher's
+         top-kd_topk passages over the full corpus (teacher = the tower's own formal query embedding)
+Train on a TSDAE tower by pointing --cache_dir at its cache. --kd_weight 0 reduces exactly to query_dann/train.py.
   L_preserve = mean(1 - cos(A(z_form), z_form))   keeps formal queries unchanged by the adapter
 GRL alpha_p = 2/(1+exp(-eta*p)) - 1. Dev is evaluated every --eval_every steps and the
 adapter + discriminator are checkpointed whenever dev nDCG@10 improves.
@@ -51,7 +54,7 @@ def parse_args():
     ap.add_argument("--run_name", default="query_dann")
     ap.add_argument("--data_dir", default=os.path.join(ROOT, "data"))
     ap.add_argument("--cache_dir", default=os.path.join(ROOT, "cache"))
-    ap.add_argument("--output_dir", default=os.path.join(ROOT, "runs"))
+    ap.add_argument("--output_dir", default=os.path.join(HERE, "runs"))
     ap.add_argument("--epochs", type=int, default=30)
     ap.add_argument("--batch_size", type=int, default=64)
     ap.add_argument("--lr", type=float, default=1e-4)
@@ -61,6 +64,9 @@ def parse_args():
     ap.add_argument("--tau", type=float, default=0.05)
     ap.add_argument("--gamma", type=float, default=0.1, help="Domain loss weight (0 = no adversarial training)")
     ap.add_argument("--mu", type=float, default=0.5, help="Formal preservation loss weight")
+    ap.add_argument("--kd_weight", type=float, default=1.0, help="Score-distillation weight lambda (0 = plain Query-DANN)")
+    ap.add_argument("--kd_topk", type=int, default=100, help="Teacher candidate passages for score distillation")
+    ap.add_argument("--kd_tau", type=float, default=0.05, help="Softmax temperature for teacher and student scores")
     ap.add_argument("--eta", type=float, default=10.0)
     ap.add_argument("--domain_targets", default="formal", choices=["formal", "formal+doc"],
                     help="What the discriminator treats as label 1: formal queries, or formal queries and positive docs")
@@ -161,13 +167,20 @@ def main():
                 json.dump({"adapter": args.adapter, "discriminator": args.discriminator, "bottleneck": args.bottleneck,
                            "adapter_dropout": args.adapter_dropout, "disc_dropout": args.disc_dropout,
                            "epoch": epoch, "step": step, "dev": metrics, "dev_formal_through_adapter": form_metrics,
-                           "dev_disc_accuracy": disc_acc}, f, indent=2)
+                           "dev_disc_accuracy": disc_acc,
+                           "method": "stacked_dann_kd", "gamma": args.gamma, "mu": args.mu,
+                           "kd_weight": args.kd_weight, "kd_topk": args.kd_topk, "kd_tau": args.kd_tau}, f, indent=2)
 
     for epoch in range(1, args.epochs + 1):
         head.train()
         for batch in loader:
             B = batch["z_inf"].size(0)
             alpha = grl_alpha(step / total_steps, args.eta)
+            if args.kd_weight > 0:
+                # Teacher: the formal twin ranked over the full corpus (no gradient).
+                with torch.no_grad(), torch.autocast(device.type, enabled=False):
+                    t_scores, t_idx = (batch["z_form"].half() @ store.corpus.T).float().topk(args.kd_topk, dim=1)
+                    kd_cand = store.corpus[t_idx].float()
             with accelerator.autocast():
                 z_q = raw.adapt(batch["z_inf"])  # adapted informal queries, L2-normalised
                 z_pres = raw.adapt(batch["z_form"]) if args.mu > 0 else None
@@ -185,7 +198,12 @@ def main():
                 loss_dom = 0.5 * bce(dom_inf, torch.zeros_like(dom_inf)) + 0.5 * bce(dom_tgt, torch.ones_like(dom_tgt))
                 loss_pres = ((1 - (z_pres.float() * batch["z_form"]).sum(-1)).mean()
                              if z_pres is not None else torch.zeros((), device=device))
-                loss = loss_nce + args.gamma * loss_dom + args.mu * loss_pres
+                loss_kd = torch.zeros((), device=device)
+                if args.kd_weight > 0:
+                    s_scores = torch.einsum("bd,bkd->bk", z_q.float(), kd_cand)
+                    loss_kd = F.kl_div(F.log_softmax(s_scores / args.kd_tau, dim=-1),
+                                       F.softmax(t_scores / args.kd_tau, dim=-1), reduction="batchmean")
+                loss = loss_nce + args.gamma * loss_dom + args.mu * loss_pres + args.kd_weight * loss_kd
 
             optimizer.zero_grad(set_to_none=True)
             accelerator.backward(loss)
@@ -198,7 +216,7 @@ def main():
                 disc_acc = 0.5 * ((dom_inf < 0).float().mean() + (dom_tgt > 0).float().mean())
                 logger.log(step, **{
                     "loss/total": loss.item(), "loss/infonce": loss_nce.item(), "loss/domain": loss_dom.item(),
-                    "loss/preserve": loss_pres.item(), "grl/alpha": alpha, "lr": optimizer.param_groups[0]["lr"],
+                    "loss/preserve": loss_pres.item(), "loss/kd": loss_kd.item(), "grl/alpha": alpha, "lr": optimizer.param_groups[0]["lr"],
                     "disc/accuracy": disc_acc.item(), "train/acc@1": (sims.argmax(1) == labels).float().mean().item(),
                 })
             if step % args.eval_every == 0 or step == total_steps:

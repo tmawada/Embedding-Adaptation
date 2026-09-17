@@ -81,6 +81,9 @@ def parse_args():
     ap.add_argument("--weight_decay", type=float, default=0.01)
     ap.add_argument("--hn_range", type=int, nargs=2, default=[10, 100])
     ap.add_argument("--adapter", default="zeroinit", choices=list(ADAPTERS))
+    ap.add_argument("--use_adapter", default="true", choices=["true", "false"],
+                    help="false = ablation with no query adapter at all (identity): nothing is trainable, "
+                         "so the run only measures the base model")
     ap.add_argument("--bottleneck", type=int, default=128)
     ap.add_argument("--adapter_dropout", type=float, default=0.1)
     ap.add_argument("--eval_every", type=int, default=50)
@@ -91,6 +94,8 @@ def parse_args():
 
 def main():
     args = parse_args()
+    if args.use_adapter == "false":
+        args.adapter = "identity"
     set_seed(args.seed)
     accelerator = Accelerator(mixed_precision=args.mixed_precision)
     device = accelerator.device
@@ -111,7 +116,22 @@ def main():
     dev = Evaluator(store, splits["dev"], args.data_dir)
 
     head = AdapterHead(args.adapter, args.bottleneck, args.adapter_dropout).to(device)
-    optimizer = torch.optim.AdamW(head.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    trainable = [p for p in head.parameters() if p.requires_grad]
+    if not trainable:  # --use_adapter false: evaluate the base model once and stop
+        accelerator.print("--use_adapter false: no trainable parameters, evaluating the base model only")
+        raw = head
+        m_inf, m_form = dev.run(dev.adapted(raw)), dev.run(dev.adapted(raw, "formal"))
+        accelerator.print(f"dev informal nDCG@10 {m_inf['nDCG@10']:.4f} | dev formal {m_form['nDCG@10']:.4f}")
+        d = os.path.join(run_dir, "best")
+        os.makedirs(d, exist_ok=True)
+        accelerator.save(raw.adapter.state_dict(), os.path.join(d, "adapter.pt"))
+        with open(os.path.join(d, "config.json"), "w") as f:
+            json.dump({"method": "no_adapter_ablation", "adapter": args.adapter, "bottleneck": args.bottleneck,
+                       "adapter_dropout": args.adapter_dropout, "step": 0,
+                       "dev_informal": m_inf, "dev_formal_through_adapter": m_form,
+                       "dev": m_inf}, f, indent=2)
+        return
+    optimizer = torch.optim.AdamW(trainable, lr=args.lr, weight_decay=args.weight_decay)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.total_steps, eta_min=args.lr_min)
     head, optimizer = accelerator.prepare(head, optimizer)
     raw = accelerator.unwrap_model(head)
