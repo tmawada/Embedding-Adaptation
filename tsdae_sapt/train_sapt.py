@@ -85,10 +85,11 @@ def parse_args():
     ap.add_argument("--max_steps", type=int, default=None, help="Stop early (smoke tests)")
     ap.add_argument("--batch_size", type=int, default=8)
     ap.add_argument("--lr", type=float, default=3e-5)
-    ap.add_argument("--weight_decay", type=float, default=0.0)
+    ap.add_argument("--weight_decay", type=float, default=0.01)
+    ap.add_argument("--warmup_ratio", type=float, default=0.1)
     ap.add_argument("--del_ratio", type=float, default=0.6)
     ap.add_argument("--min_words", type=int, default=4)
-    ap.add_argument("--max_length", type=int, default=128)
+    ap.add_argument("--max_length", type=int, default=64)
     ap.add_argument("--log_every", type=int, default=10)
     ap.add_argument("--no_save", action="store_true")
     ap.add_argument("--seed", type=int, default=42)
@@ -120,7 +121,9 @@ def main():
                         shuffle=True, drop_last=False, collate_fn=lambda b: b)
     optimizer = torch.optim.AdamW(params, lr=args.lr, weight_decay=args.weight_decay)
     total = len(loader) * args.epochs if args.max_steps is None else min(args.max_steps, len(loader) * args.epochs)
-    print(f"steps: {total} ({len(loader)}/epoch, batch {args.batch_size}, lr {args.lr} constant)")
+    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=args.lr, total_steps=total,
+                                                    pct_start=args.warmup_ratio, anneal_strategy="linear")
+    print(f"steps: {total} ({len(loader)}/epoch, batch {args.batch_size}, lr max {args.lr} with OneCycleLR)")
 
     log_dir = os.path.join(HERE, "runs", "train")
     os.makedirs(log_dir, exist_ok=True)
@@ -136,7 +139,8 @@ def main():
             src = tokenizer(list(noisy), padding=True, truncation=True, max_length=args.max_length, return_tensors="pt").to(device)
             tgt = tokenizer(list(original), padding=True, truncation=True, max_length=args.max_length, return_tensors="pt").to(device)
             with torch.autocast("cuda", dtype=torch.bfloat16):
-                cls = encoder(**src).last_hidden_state[:, 0]  # BGE-M3 dense pooling, before normalisation
+                raw_cls = encoder(**src).last_hidden_state[:, 0]
+                cls = F.normalize(raw_cls.float(), dim=-1).to(torch.bfloat16)  # Ensure L2-normalized vector for bottleneck
                 logits = decoder(input_ids=tgt["input_ids"][:, :-1], attention_mask=tgt["attention_mask"][:, :-1],
                                  encoder_hidden_states=cls[:, None, :],
                                  encoder_attention_mask=torch.ones(cls.size(0), 1, device=device, dtype=torch.long),
@@ -148,6 +152,7 @@ def main():
             loss.backward()
             torch.nn.utils.clip_grad_norm_(params, 1.0)
             optimizer.step()
+            scheduler.step()
             step += 1
             recent.append(loss.item())
             if step % args.log_every == 0 or step == total:

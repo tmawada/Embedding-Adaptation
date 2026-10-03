@@ -40,12 +40,16 @@ def main():
     args = ap.parse_args()
 
     per_query, report, emb, ref_qids = {}, {}, {}, None
-    passage_rows = torch.randint(0, 500_000, (5000,), generator=torch.Generator().manual_seed(0))
+    # Seeded fresh per condition so every condition samples the SAME 5k passage rows — passages_5k_sample
+    # is only meaningful if it is identical across conditions. The bound (corpus size) is unknown until a
+    # store exists, so it is read as len(store.doc_ids) inside the loop rather than hardcoded.
+    ROW_SAMPLE, ROW_SEED = 5000, 0
     for key, (label, cache_dir) in CONDITIONS.items():
         if not os.path.exists(os.path.join(cache_dir, "corpus_emb.npy")):
             print(f"skipping {key}: no cache at {cache_dir}")
             continue
         store = EmbeddingStore(cache_dir)
+        passage_rows = torch.randint(0, len(store.doc_ids), (ROW_SAMPLE,), generator=torch.Generator().manual_seed(ROW_SEED))
         with open(os.path.join(cache_dir, "splits.json")) as f:
             ev = Evaluator(store, json.load(f)[args.split], args.data_dir)
         ref_qids = ref_qids or ev.qids

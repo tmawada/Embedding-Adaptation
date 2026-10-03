@@ -67,10 +67,11 @@ class NoisyQueryDataset(Dataset):
 
 
 def build_model(model_id: str, max_seq_length: int) -> SentenceTransformer:
-    """BGE-M3 backbone with CLS pooling: the same representation the frozen document tower uses."""
+    """BGE-M3 backbone with CLS pooling and L2 normalization: matching dense retrieval embedding space."""
     word = models.Transformer(model_id, max_seq_length=max_seq_length)
     pool = models.Pooling(word.get_word_embedding_dimension(), pooling_mode="cls")
-    return SentenceTransformer(modules=[word, pool])
+    norm = models.Normalize()
+    return SentenceTransformer(modules=[word, pool, norm])
 
 
 @torch.no_grad()

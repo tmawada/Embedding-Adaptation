@@ -116,7 +116,9 @@ def grl_alpha(progress: float, eta: float = 10.0) -> float:
 class QueryAdapter(nn.Module):
     """Residual bottleneck adapter applied to the (L2-normalised) dense query vector.
 
-    z_out = LayerNorm(z_in + Up(Dropout(GELU(LayerNorm(Down(z_in))))))
+    z_out = L2Norm(z_in + Up(Dropout(GELU(LayerNorm(Down(z_in))))))
+
+    Output is L2-normalised so cosine similarity works correctly.
     """
 
     def __init__(self, dim: int = EMB_DIM, bottleneck: int = 512, dropout: float = 0.1):
@@ -126,15 +128,13 @@ class QueryAdapter(nn.Module):
         self.act = nn.GELU()
         self.drop = nn.Dropout(dropout)
         self.up = nn.Linear(bottleneck, dim)
-        self.out_norm = nn.LayerNorm(dim)
-        # Zero-init the up projection so training starts from LayerNorm(z_in),
-        # i.e. (close to) the unadapted embedding.
+        # Zero-init the up projection so training starts from identity (z_in).
         nn.init.zeros_(self.up.weight)
         nn.init.zeros_(self.up.bias)
 
     def forward(self, z_in: torch.Tensor) -> torch.Tensor:
         h = self.drop(self.act(self.norm(self.down(z_in))))
-        return self.out_norm(z_in + self.up(h))
+        return F.normalize(z_in + self.up(h), dim=-1)
 
 
 class ZeroInitQueryAdapter(nn.Module):

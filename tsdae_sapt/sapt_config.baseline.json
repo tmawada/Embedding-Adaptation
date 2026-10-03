@@ -1,0 +1,22 @@
+{
+  "data": "/home/yd/adapt-dann-retrieve/bge_dann/data/prdect-id.csv",
+  "text_column": "Customer Review",
+  "model": "BAAI/bge-m3",
+  "output_dir": "/home/yd/adapt-dann-retrieve/bge_dann/tsdae_sapt/output/bge-m3-sapt-informal-id",
+  "epochs": 1,
+  "max_steps": null,
+  "batch_size": 8,
+  "lr": 3e-05,
+  "weight_decay": 0.0,
+  "del_ratio": 0.6,
+  "min_words": 4,
+  "max_length": 128,
+  "log_every": 10,
+  "no_save": false,
+  "seed": 42,
+  "reviews_used": 4911,
+  "steps": 614,
+  "final_loss": 6.282982110977173,
+  "decoder_tied_tensors": 389,
+  "decoder_new_tensors": 240
+}

@@ -4,6 +4,9 @@
                       (corpus files are symlinked to ../cache, hard negatives copied). Shows how far the
                       query space drifted away from the frozen passage index.
   --mode symmetric  : SAPT encodes queries AND all 500k passages (~14 min, +1 GB); hard negatives re-mined.
+
+--out_cache picks the destination (default <this dir>/cache/sapt_<mode>); pass the same value to
+--cache_dir when training on the result, so the orchestrators (train_all_9_models.sh, ...) share one path.
 """
 from __future__ import annotations
 
@@ -36,9 +39,11 @@ def main():
     ap.add_argument("--token_budget", type=int, default=48000)
     ap.add_argument("--mine_depth", type=int, default=200)
     ap.add_argument("--min_free_gb", type=float, default=2.0)
+    ap.add_argument("--out_cache", default=None,
+                    help="Destination cache dir (default: <this dir>/cache/sapt_<mode>)")
     args = ap.parse_args()
 
-    cache_dir = os.path.join(HERE, "cache", f"sapt_{args.mode}")
+    cache_dir = args.out_cache or os.path.join(HERE, "cache", f"sapt_{args.mode}")
     os.makedirs(cache_dir, exist_ok=True)
     path = lambda name: os.path.join(cache_dir, name)
     # Same pooling / prefixes / lengths as BGE-M3 (CLS, no prefixes), only the weights differ.

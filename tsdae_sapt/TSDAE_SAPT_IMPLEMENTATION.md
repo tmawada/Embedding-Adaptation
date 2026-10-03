@@ -1,105 +1,120 @@
-# Sentence-Adaptive Pre-Training (SAPT) for BGE-M3 using TSDAE
+# TSDAE-SAPT for BGE-M3 — design record and results
 
-## Project Goal
-Adapt the **BGE-M3** base embedding model to natively understand the syntax, slang, and structural noise of informal Indonesian text. 
+**Status: negative result. The line is retired.** Training code is `train_sapt.py` (authoritative for
+the method); evaluation is `prepare_sapt_cache.py` + `evaluate_sapt.py`. This file previously held a
+design sketch written *before* the code and superseded by it — see "Corrections" below for the parts
+that were wrong.
 
-By running Unsupervised **TSDAE (Transformer-based Sequential Denoising Auto-Encoder)** on the `prdect-id` dataset, the encoder will learn to map informal product reviews into robust dense vectors at the sentence level, acting as the perfect foundation for downstream informal query retrieval.
+## What this was trying to do
 
----
+Adapt the **BGE-M3** query tower so it natively understands informal/slang Indonesian, by unsupervised
+continued pretraining on informal product reviews — then measure what that does to MIRACL-id retrieval.
 
-## Dataset Processing (`prdect-id`)
+TSDAE (Wang et al., 2021): corrupt a sentence by deleting ~60% of its words, compress the remainder into
+a single `[CLS]` vector, and train a decoder to reconstruct the original sentence from that one vector.
+The bottleneck forces the encoder to model the *deleted* tokens, not just the visible ones — the hope
+being that this transfers to guessing informal/slang surface forms from context.
 
-The `prdect-id` dataset contains Indonesian product reviews and sentiment labels. 
-* **Crucial Rule:** TSDAE is entirely unsupervised. We will **discard the sentiment labels** and metadata. 
-* We only extract the raw review text string. The model learns semantics by attempting to reconstruct the deleted words from the review string itself.
+Unlike the rest of the repo, this method **touches the encoder weights and rebuilds the index**. There
+is no query adapter anywhere in this folder.
 
----
+## Data (`data/prdect-id.csv`)
 
-## Architecture Setup
+Indonesian product reviews. Fully unsupervised: the `Sentiment` label is discarded, only
+`Customer Review` is used.
 
-1. **Noise Function**: `DenoisingAutoEncoderDataset` will automatically apply deletion noise to the input reviews (deleting $\sim 60\%$ of the tokens).
-2. **Encoder**: The frozen `BAAI/bge-m3` backbone.
-3. **Pooling**: Extract the `[CLS]` token to act as the strict informational bottleneck.
-4. **Decoder**: A shallow Transformer decoder attached to the `[CLS]` vector.
-5. **Loss Objective**: Cross-Entropy loss between the decoder's output and the original, uncorrupted review text.
+- 5,305 unique reviews → **4,911 kept** (deduplicated, non-empty, ≥ `min_words` = 4 words — short
+  reviews can't survive 60% deletion).
 
----
+## Method (as implemented)
 
-## Step-by-Step Implementation Script (`train_sapt.py`)
+```
+noisy review (60% words deleted, resampled each draw)
+  → BGE-M3 encoder  [FULLY FINE-TUNED]  → last_hidden_state[:, 0]  = [CLS] (1024-d)
+      ↑                                        │  sole information channel, pre-normalisation
+      │        gradients from reconstruction   ↓
+      └────────── XLMRobertaForCausalLM decoder, cross-attends to that single vector
+                  → token cross-entropy vs the ORIGINAL uncorrupted review
+```
 
-Ensure your environment has the required libraries:
-`pip install sentence-transformers pandas nltk datasets`
+- **Encoder**: `BAAI/bge-m3`, 568M params, trained. Saving the encoder only is the deliverable; the
+  decoder is discarded after training.
+- **Decoder**: full `XLMRobertaForCausalLM` (not a shallow stack), weights **tied** to the encoder by
+  parameter name — 389 tensors shared, 240 new (cross-attention + LM-head transform), plus the tied
+  word-embedding matrix as `lm_head`. Tying means reconstruction gradients flow straight into the
+  encoder.
+- **Loss**: cross-entropy against the uncorrupted review, pads ignored.
+- **Optimisation**: AdamW, lr 3e-5 constant, weight decay 0, grad clip 1.0, bf16 autocast, batch 8,
+  max_length 128, seed 42.
 
-```python
-import pandas as pd
-import nltk
-from sentence_transformers import SentenceTransformer, models, datasets, losses
-from torch.utils.data import DataLoader
+Run: **614 steps / 1 epoch, reconstruction loss 16.77 → 6.28** (~5 min, RTX 3090). Model at
+`output/bge-m3-sapt-informal-id/` (~2.3 GB) with a `sapt_config.json` sidecar. Log: `runs/train/log.jsonl`.
 
-# 1. Download NLTK punkt for sentence splitting (required by TSDAE noise function)
-nltk.download('punkt')
-nltk.download('punkt_tab')
+## Corrections to the original design sketch
 
-def load_informal_corpus(csv_path: str):
-    """
-    Loads the prdect-id dataset and extracts only the text column.
-    Drops all sentiment labels as TSDAE is unsupervised.
-    """
-    print(f"Loading dataset from {csv_path}...")
-    df = pd.read_csv(csv_path)
-    
-    # ASSUMPTION: The text column in prdect-id is named 'Review' or 'text'. Adjust as needed.
-    text_column = 'Text' if 'Text' in df.columns else df.columns[0] 
-    
-    # Drop nulls and extract as a flat Python list of strings
-    train_sentences = df[text_column].dropna().astype(str).tolist()
-    print(f"Loaded {len(train_sentences)} informal Indonesian sentences.")
-    return train_sentences
+The first version of this file described a configuration that would have produced no effect, and gave a
+dependency rationale that does not hold:
 
-def train_tsdae():
-    # 2. Load the informal review dataset
-    train_sentences = load_informal_corpus('prdect-id.csv')
+1. **"Frozen encoder" was wrong.** A frozen encoder cannot change its embeddings, so the entire
+   experiment would have been a no-op — the loss would still fall (the decoder learns to decode a fixed
+   representation) while every embedding stayed bit-identical to base BGE-M3. The implementation fully
+   fine-tunes the encoder. This is the one place the code is unambiguously better than the plan.
+2. **The stated reason for bypassing sentence-transformers was wrong.** The code claims
+   "sentence-transformers needs Python >= 3.10". It does not: sentence-transformers 3.2.1 imports
+   cleanly on this Python 3.8.10, and `losses.DenoisingAutoEncoderLoss` provides
+   `tie_encoder_decoder=True` exactly as hand-rolled here. The rewrite bought direct control of the
+   `[CLS]`-only bottleneck (no L2 normalisation mid-training) and native bf16 autocast — a deliberate
+   choice, not a hard blocker. The only genuine gap is that `nltk` is **not installed** here, which
+   `DenoisingAutoEncoderDataset` needs for its punkt sentence splitting.
+3. **Column name**: the sketch guessed `'Review'` / `'text'`; the column is `'Customer Review'`.
 
-    # 3. Create the TSDAE Denoising Dataset
-    # This wrapper automatically applies word deletion noise during training
-    train_dataset = datasets.DenoisingAutoEncoderDataset(train_sentences)
-    
-    # Use a small batch size as BGE-M3 is large (adjust based on your GPU VRAM)
-    train_dataloader = DataLoader(train_dataset, batch_size=8, shuffle=True)
+The sketch also contained no evaluation, no dual cache modes, no hard-negative re-mining, and no drift
+diagnostics — those were added during implementation.
 
-    # 4. Initialize the BGE-M3 Base Model
-    model_name = 'BAAI/bge-m3'
-    print(f"Initializing base encoder: {model_name}")
-    
-    # We load it as modular components to control the pooling layer explicitly
-    word_embedding_model = models.Transformer(model_name)
-    pooling_model = models.Pooling(
-        word_embedding_model.get_word_embedding_dimension(), 
-        pooling_mode_cls_token=True,
-        pooling_mode_mean_tokens=False
-    )
-    model = SentenceTransformer(modules=[word_embedding_model, pooling_model])
+## Results
 
-    # 5. Define the Denoising AutoEncoder Loss
-    # tie_encoder_decoder=True reuses the encoder weights for the decoder, 
-    # massively saving memory and improving alignment.
-    loss = losses.DenoisingAutoEncoderLoss(model, tie_encoder_decoder=True)
+MIRACL-id, 578 test queries, 500,000 passages. nDCG@10. Three conditions, identical queries and splits
+(`runs/zero_shot_test.json`):
 
-    # 6. Execute SAPT Training
-    print("Starting TSDAE SAPT Training...")
-    model.fit(
-        train_objectives=[(train_dataloader, loss)],
-        epochs=1,                 # 1 epoch is usually sufficient for TSDAE on large datasets
-        weight_decay=0,
-        scheduler='constantlr',
-        optimizer_params={'lr': 3e-5},
-        show_progress_bar=True
-    )
+| condition | queries | passages | formal | informal | drop | cos(inf, formal twin) |
+|---|---|---|---|---|---|---|
+| base BGE-M3 | base | base | 0.6166 | 0.5373 | −0.0793 | 0.8976 |
+| `query_only` | SAPT | base (symlinked) | 0.5340 | 0.3604 | −0.1736 | 0.8085 |
+| `symmetric` | SAPT | SAPT | 0.4289 | 0.2468 | −0.1820 | 0.8085 |
 
-    # 7. Save the SAPT-adapted base model
-    output_path = './output/bge-m3-sapt-informal-id'
-    model.save(output_path)
-    print(f"SAPT model successfully saved to {output_path}")
+Embedding drift vs base (mean cosine to the same vector under base): formal queries 0.809, informal
+0.761, passages 0.704 (and exactly 1.000 in `query_only`, confirming the symlink). Every paired
+bootstrap against base is p ≈ 0.001 with CIs excluding zero. Dev reproduces test almost exactly
+(0.6144 → 0.4124 formal, 0.5328 → 0.2342 informal).
 
-if __name__ == '__main__':
-    train_tsdae()
+**Reading the three rows:**
+
+- The style gap *did* collapse — cos(informal, formal twin) fell 0.898 → 0.808, so the encoder really
+  did merge the two styles. But it merged them by **degrading the informal side** (0.537 → 0.360), not
+  by lifting it, and the formal side degraded too (0.617 → 0.534) despite never being in the training
+  data. That's forgetting, not adaptation.
+- Rebuilding the index didn't rescue it. `symmetric` re-encodes passages to meet the queries (drift
+  only 0.704, so the index did move) and still scores *worse* than `query_only`. The failure is not a
+  query/passage space mismatch — **the encoder's retrieval semantics were harmed directly.**
+
+## Cross-experiment evidence (the conclusion does not hinge on this folder)
+
+- The domain-mismatch explanation (prdect-id reviews ≠ MIRACL factoid queries) was tested and
+  **refuted** by `../tsdae_sapt_queries/`, which runs the same objective on the task's *own* informal
+  queries: 0.5266 informal vs 0.5373 base in the harmonized protocol (p = 0.001). Training on
+  off-domain reviews is not the problem; the `[CLS]`-only reconstruction bottleneck is.
+- Stacking the broken tower with a trained adapter contributes **nothing**:
+  `../multi_seed/runs/seed_report_test.md` reports TSDAE(task queries) + Query-DANN linear at
+  0.5774 ± 0.0018 vs Query-DANN linear alone at 0.5775 ± 0.0008 — a difference of **−0.01 ± 0.21,
+  p = 0.981**. The adapter learns to route around the damaged tower.
+- Rankings live in `../comparison/runs/harmonized/report_harmonized_test.md`. Briefly: SAPT (reviews)
+  alone 0.5351 informal, i.e. −0.22 pts vs base with the gap essentially unchanged (−7.92 vs −7.93);
+  LLM normalisation 0.6017, gap narrowed **+6.44** — the only method with real headroom.
+
+## Conclusion
+
+TSDAE sentence-adaptive pretraining does not help this task — alone, or stacked under an adapter. The
+`[CLS]`-only denoising bottleneck erodes retrieval quality faster than it transfers informal-register
+fluency. **Do not rerun this folder.** The finding stands as a negative result: adapting encoder weights
+on unlabelled informal text is dominated by query-side adapters and by LLM query normalisation on this
+benchmark.
