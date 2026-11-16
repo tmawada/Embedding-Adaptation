@@ -1,0 +1,1 @@
+"""Benchmark test package for BGE-M3 vs Query-DANN efficiency comparison."""

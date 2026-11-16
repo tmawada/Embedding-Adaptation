@@ -1,0 +1,22 @@
+{
+  "formal": {
+    "nDCG@10": 0.6144143837389932,
+    "MRR@10": 0.7175230282095567,
+    "Recall@100": 0.9385784192779011
+  },
+  "zero_shot_informal": {
+    "nDCG@10": 0.5328288152626259,
+    "MRR@10": 0.6441555637799161,
+    "Recall@100": 0.8837537103081143
+  },
+  "transformed_informal": {
+    "nDCG@10": 0.5918164750094612,
+    "MRR@10": 0.6967760506620609,
+    "Recall@100": 0.9141088905337609
+  },
+  "avg_cosine_similarity": 0.9659496545791626,
+  "gap_closed_pct": 72.301585744202,
+  "split": "dev",
+  "transform_type": "linear",
+  "transform_dir": "/home/yd/adapt-dann-retrieve/bge_dann/embed_transform/transforms"
+}

@@ -1,0 +1,190 @@
+[
+  {
+    "run_id": "query_dann_efficiency_20261105_180548_e1056b8a",
+    "timestamp": "2026-11-05T18:06:09.650462",
+    "model_condition": "M0",
+    "device": "cpu",
+    "precision": "fp32",
+    "batch_size": 1,
+    "max_length": 512,
+    "mode": "full_pipeline",
+    "warmup_steps": 5,
+    "repetitions": 10,
+    "encoder_latency_mean": 85.11462649330497,
+    "encoder_latency_median": 85.14303667470813,
+    "encoder_latency_p95": 85.24176166392863,
+    "encoder_latency_std": 0.1271978703515856,
+    "encoder_throughput_qps": 11.748861989997208,
+    "adapter_latency_mean": 0,
+    "adapter_latency_median": 0,
+    "adapter_latency_p95": 0,
+    "adapter_latency_std": 0,
+    "adapter_throughput_qps": 0,
+    "total_latency_mean": 341.04755744338036,
+    "total_latency_median": 340.9514161758125,
+    "total_latency_p95": 341.95865490473807,
+    "total_latency_std": 0.6802881431650746,
+    "total_throughput_qps": 2.9321423894555143,
+    "ndcg_at_10": 0.604131545373461,
+    "mrr_at_10": 0.7565000000000001,
+    "recall_at_100": 0.8977777777777777,
+    "retrieval_detailed": {
+      "M0_formal": {
+        "nDCG@10": 0.6615030132240642,
+        "MRR@10": 0.7898333333333334,
+        "Recall@100": 0.9426666666666667
+      },
+      "M0_informal": {
+        "nDCG@10": 0.604131545373461,
+        "MRR@10": 0.7565000000000001,
+        "Recall@100": 0.8977777777777777
+      }
+    },
+    "peak_rss_mb": 3268.5390625,
+    "peak_vram_mb": null,
+    "raw_latencies": [
+      340.83943348377943,
+      341.3281375542283,
+      341.6081592440605,
+      340.207957662642,
+      342.08892937749624,
+      340.79503919929266,
+      340.8190943300724,
+      341.06339886784554,
+      341.79943054914474,
+      339.9259941652417
+    ]
+  },
+  {
+    "run_id": "query_dann_efficiency_20261105_180548_e1056b8a",
+    "timestamp": "2026-11-05T18:06:27.588925",
+    "model_condition": "M1",
+    "device": "cpu",
+    "precision": "fp32",
+    "batch_size": 1,
+    "max_length": 512,
+    "mode": "full_pipeline",
+    "warmup_steps": 5,
+    "repetitions": 10,
+    "encoder_latency_mean": 70.54901542142034,
+    "encoder_latency_median": 70.40923088788986,
+    "encoder_latency_p95": 71.26084305346012,
+    "encoder_latency_std": 0.39328269285174,
+    "encoder_throughput_qps": 14.17454225302167,
+    "adapter_latency_mean": 0.11076163500547409,
+    "adapter_latency_median": 0.1104394905269146,
+    "adapter_latency_p95": 0.11367658153176308,
+    "adapter_latency_std": 0.0018197236642933444,
+    "adapter_throughput_qps": 9028.396880838547,
+    "total_latency_mean": 324.96907310560346,
+    "total_latency_median": 324.89534886553884,
+    "total_latency_p95": 325.6125822197646,
+    "total_latency_std": 0.41866701643504833,
+    "total_throughput_qps": 3.0772159037885904,
+    "ndcg_at_10": 0.604131545373461,
+    "mrr_at_10": 0.7565000000000001,
+    "recall_at_100": 0.8977777777777777,
+    "retrieval_detailed": {
+      "M1_formal": {
+        "nDCG@10": 0.6615030132240642,
+        "MRR@10": 0.7898333333333334,
+        "Recall@100": 0.9426666666666667
+      },
+      "M1_informal": {
+        "nDCG@10": 0.604131545373461,
+        "MRR@10": 0.7565000000000001,
+        "Recall@100": 0.8977777777777777
+      },
+      "M1_adapted_informal": {
+        "nDCG@10": 0.604131545373461,
+        "MRR@10": 0.7565000000000001,
+        "Recall@100": 0.8977777777777777
+      },
+      "M1_adapted_formal": {
+        "nDCG@10": 0.6615030132240642,
+        "MRR@10": 0.7898333333333334,
+        "Recall@100": 0.9426666666666667
+      }
+    },
+    "peak_rss_mb": 3451.51171875,
+    "peak_vram_mb": null,
+    "raw_latencies": [
+      325.1195587217808,
+      324.42554272711277,
+      324.64727479964495,
+      325.04287268966436,
+      324.8265730217099,
+      324.9359205365181,
+      324.8295793309808,
+      324.992666952312,
+      326.01596508175135,
+      324.8547771945596
+    ]
+  },
+  {
+    "run_id": "query_dann_efficiency_20261105_180548_e1056b8a",
+    "timestamp": "2026-11-05T18:06:45.419908",
+    "model_condition": "M2",
+    "device": "cpu",
+    "precision": "fp32",
+    "batch_size": 1,
+    "max_length": 512,
+    "mode": "full_pipeline",
+    "warmup_steps": 5,
+    "repetitions": 10,
+    "encoder_latency_mean": 70.88165692985058,
+    "encoder_latency_median": 70.64076932147145,
+    "encoder_latency_p95": 71.74554062075913,
+    "encoder_latency_std": 0.4974641425225232,
+    "encoder_throughput_qps": 14.108022347582388,
+    "adapter_latency_mean": 0.11140666902065277,
+    "adapter_latency_median": 0.11123530566692352,
+    "adapter_latency_p95": 0.11505037546157837,
+    "adapter_latency_std": 0.00238115957824711,
+    "adapter_throughput_qps": 8976.123321796993,
+    "total_latency_mean": 326.1607580818236,
+    "total_latency_median": 325.84363175556064,
+    "total_latency_p95": 327.87048323079944,
+    "total_latency_std": 1.2089654480444199,
+    "total_throughput_qps": 3.0659727610429797,
+    "ndcg_at_10": 0.5782889742698474,
+    "mrr_at_10": 0.7026666666666667,
+    "recall_at_100": 0.9166111111111109,
+    "retrieval_detailed": {
+      "M2_formal": {
+        "nDCG@10": 0.6615030132240642,
+        "MRR@10": 0.7898333333333334,
+        "Recall@100": 0.9426666666666667
+      },
+      "M2_informal": {
+        "nDCG@10": 0.604131545373461,
+        "MRR@10": 0.7565000000000001,
+        "Recall@100": 0.8977777777777777
+      },
+      "M2_adapted_informal": {
+        "nDCG@10": 0.5782889742698474,
+        "MRR@10": 0.7026666666666667,
+        "Recall@100": 0.9166111111111109
+      },
+      "M2_adapted_formal": {
+        "nDCG@10": 0.6582711706617956,
+        "MRR@10": 0.7668333333333334,
+        "Recall@100": 0.9469444444444443
+      }
+    },
+    "peak_rss_mb": 3555.3359375,
+    "peak_vram_mb": null,
+    "raw_latencies": [
+      325.01487247645855,
+      325.40128473192453,
+      324.7797070071101,
+      325.10251831263304,
+      325.4164829850197,
+      326.2707805261016,
+      327.4954790249467,
+      327.88156997412443,
+      326.3879530131817,
+      327.85693276673555
+    ]
+  }
+]

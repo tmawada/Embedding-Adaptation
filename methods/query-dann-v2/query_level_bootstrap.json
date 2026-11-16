@@ -1,0 +1,58 @@
+{
+  "n_seeds": 5,
+  "seeds": [
+    42,
+    84,
+    123,
+    256,
+    512
+  ],
+  "condition_means": {
+    "v1_g01": 0.55,
+    "v1_g0": 0.5505,
+    "v2_g01": 0.5572,
+    "v2_g0": 0.5505
+  },
+  "bootstraps": {
+    "v2_g01 vs v1_g01": {
+      "diff": 0.0072,
+      "ci95": [
+        0.0043,
+        0.0102
+      ],
+      "p": 0.0001,
+      "n_queries": 553,
+      "queries_favoring_a": 229
+    },
+    "v2_g01 vs v2_g0": {
+      "diff": 0.0067,
+      "ci95": [
+        0.0035,
+        0.0099
+      ],
+      "p": 0.0001,
+      "n_queries": 553,
+      "queries_favoring_a": 215
+    },
+    "v1_g01 vs v1_g0": {
+      "diff": -0.0005,
+      "ci95": [
+        -0.0034,
+        0.0025
+      ],
+      "p": 0.7291,
+      "n_queries": 553,
+      "queries_favoring_a": 157
+    },
+    "v2_g0 vs v1_g0": {
+      "diff": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "p": 1.0,
+      "n_queries": 553,
+      "queries_favoring_a": 0
+    }
+  }
+}

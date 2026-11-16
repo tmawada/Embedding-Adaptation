@@ -1,0 +1,34 @@
+# Qwen2.5 3B Local LLM Configuration
+# Model: qwen2.5:3b-instruct-q4_K_M (1.9 GB, 4-bit quantized)
+
+model:
+  name: "qwen2.5:3b-instruct-q4_K_M"
+  endpoint: "http://localhost:11434"
+  context_length: 4096
+  temperature: 0.0
+  top_p: 1.0
+  top_k: 1
+  max_output_tokens: 128
+  repeat_penalty: 1.0
+  seed: 42
+
+# Normalization settings (matching Gemini baseline for fair comparison)
+normalization:
+  prompt_version: "id-normalise-v1"
+  few_shot_examples: 3
+  batch_size: 1  # Process one query per request for accurate latency measurement
+  max_concurrent: 1  # Sequential for consistent latency profiling
+  system_prompt: ""  # Empty - we use the instruction directly
+
+# Profiling settings (for future compute resource reporting)
+profiling:
+  warmup_queries: 10
+  measurement_queries: 100
+  track_gpu_memory: true
+  track_system_memory: true
+  track_tokens: true  # Track input/output tokens if available
+
+# Output settings
+output:
+  cache_dir: "local_llm/cache"
+  format: "jsonl"  # One record per query, resumable

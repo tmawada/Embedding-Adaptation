@@ -3,7 +3,6 @@
 # ---------------------------------------------------------------------------
 /data/
 **/cache/
-**/output/
 
 # ---------------------------------------------------------------------------
 # Trained weights and binary artefacts
@@ -24,7 +23,8 @@ events.out.tfevents.*
 /logs/
 
 # ---------------------------------------------------------------------------
-# Run directories: ignore checkpoints, keep the small result summaries
+# Training output directories (methods/<name>/outputs/; llm_rewrite and
+# multi_seed still use runs/): ignore checkpoints, keep the small result summaries
 # ---------------------------------------------------------------------------
 **/runs/**
 !**/runs/**/
@@ -34,6 +34,16 @@ events.out.tfevents.*
 !**/runs/**/comparison*.json
 !**/runs/**/test_*.json
 !**/runs/**/zero_shot*.json
+
+**/outputs/**
+!**/outputs/**/
+!**/outputs/**/*.md
+!**/outputs/**/summary*.json
+!**/outputs/**/report*.json
+!**/outputs/**/comparison*.json
+!**/outputs/**/test_*.json
+!**/outputs/**/zero_shot*.json
+!**/outputs/**/*_results.json
 
 # ---------------------------------------------------------------------------
 # Python / editor / secrets

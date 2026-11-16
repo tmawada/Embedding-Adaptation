@@ -1,0 +1,190 @@
+[
+  {
+    "run_id": "query_dann_efficiency_20261105_180448_33b69ee5",
+    "timestamp": "2026-11-05T18:05:06.560770",
+    "model_condition": "M0",
+    "device": "cpu",
+    "precision": "fp32",
+    "batch_size": 1,
+    "max_length": 512,
+    "mode": "full_pipeline",
+    "warmup_steps": 5,
+    "repetitions": 10,
+    "encoder_latency_mean": 85.30758181586862,
+    "encoder_latency_median": 85.27255384251475,
+    "encoder_latency_p95": 85.61199577525258,
+    "encoder_latency_std": 0.19832053295504287,
+    "encoder_throughput_qps": 11.722287500288557,
+    "adapter_latency_mean": 0,
+    "adapter_latency_median": 0,
+    "adapter_latency_p95": 0,
+    "adapter_latency_std": 0,
+    "adapter_throughput_qps": 0,
+    "total_latency_mean": 341.37788070365787,
+    "total_latency_median": 341.2041300907731,
+    "total_latency_p95": 342.0908844098449,
+    "total_latency_std": 0.4452658996290397,
+    "total_throughput_qps": 2.9293051967478716,
+    "ndcg_at_10": 0.604131545373461,
+    "mrr_at_10": 0.7565000000000001,
+    "recall_at_100": 0.8977777777777777,
+    "retrieval_detailed": {
+      "M0_formal": {
+        "nDCG@10": 0.6615030132240642,
+        "MRR@10": 0.7898333333333334,
+        "Recall@100": 0.9426666666666667
+      },
+      "M0_informal": {
+        "nDCG@10": 0.604131545373461,
+        "MRR@10": 0.7565000000000001,
+        "Recall@100": 0.8977777777777777
+      }
+    },
+    "peak_rss_mb": 3297.8515625,
+    "peak_vram_mb": null,
+    "raw_latencies": [
+      340.93613363802433,
+      341.17463510483503,
+      341.2336250767112,
+      341.5496461093426,
+      341.0555189475417,
+      341.4736706763506,
+      342.4718100577593,
+      341.1675924435258,
+      341.6253086179495,
+      341.09086636453867
+    ]
+  },
+  {
+    "run_id": "query_dann_efficiency_20261105_180448_33b69ee5",
+    "timestamp": "2026-11-05T18:05:25.177274",
+    "model_condition": "M1",
+    "device": "cpu",
+    "precision": "fp32",
+    "batch_size": 1,
+    "max_length": 512,
+    "mode": "full_pipeline",
+    "warmup_steps": 5,
+    "repetitions": 10,
+    "encoder_latency_mean": 86.65836350992322,
+    "encoder_latency_median": 86.6401931270957,
+    "encoder_latency_p95": 86.81720355525613,
+    "encoder_latency_std": 0.1104377524805106,
+    "encoder_throughput_qps": 11.539567094242328,
+    "adapter_latency_mean": 0.11463286355137825,
+    "adapter_latency_median": 0.1109447330236435,
+    "adapter_latency_p95": 0.13372874818742272,
+    "adapter_latency_std": 0.012302512894609067,
+    "adapter_throughput_qps": 8723.501873891528,
+    "total_latency_mean": 339.6716301329434,
+    "total_latency_median": 339.69101030379534,
+    "total_latency_p95": 340.3024454601109,
+    "total_latency_std": 0.5419245862149856,
+    "total_throughput_qps": 2.944019786429064,
+    "ndcg_at_10": 0.604131545373461,
+    "mrr_at_10": 0.7565000000000001,
+    "recall_at_100": 0.8977777777777777,
+    "retrieval_detailed": {
+      "M1_formal": {
+        "nDCG@10": 0.6615030132240642,
+        "MRR@10": 0.7898333333333334,
+        "Recall@100": 0.9426666666666667
+      },
+      "M1_informal": {
+        "nDCG@10": 0.604131545373461,
+        "MRR@10": 0.7565000000000001,
+        "Recall@100": 0.8977777777777777
+      },
+      "M1_adapted_informal": {
+        "nDCG@10": 0.604131545373461,
+        "MRR@10": 0.7565000000000001,
+        "Recall@100": 0.8977777777777777
+      },
+      "M1_adapted_formal": {
+        "nDCG@10": 0.6615030132240642,
+        "MRR@10": 0.7898333333333334,
+        "Recall@100": 0.9426666666666667
+      }
+    },
+    "peak_rss_mb": 3463.7421875,
+    "peak_vram_mb": null,
+    "raw_latencies": [
+      339.8002963513136,
+      339.9954764172435,
+      340.35730082541704,
+      339.5817242562771,
+      339.0205893665552,
+      339.42303247749805,
+      339.32751324027777,
+      340.2133472263813,
+      338.76162115484476,
+      340.2354000136256
+    ]
+  },
+  {
+    "run_id": "query_dann_efficiency_20261105_180448_33b69ee5",
+    "timestamp": "2026-11-05T18:05:43.175972",
+    "model_condition": "M2",
+    "device": "cpu",
+    "precision": "fp32",
+    "batch_size": 1,
+    "max_length": 512,
+    "mode": "full_pipeline",
+    "warmup_steps": 5,
+    "repetitions": 10,
+    "encoder_latency_mean": 74.04915438964963,
+    "encoder_latency_median": 74.0425968542695,
+    "encoder_latency_p95": 74.60842155851424,
+    "encoder_latency_std": 0.3914151761512293,
+    "encoder_throughput_qps": 13.504543140870451,
+    "adapter_latency_mean": 0.11394182220101357,
+    "adapter_latency_median": 0.11014332994818687,
+    "adapter_latency_p95": 0.13029770925641057,
+    "adapter_latency_std": 0.010110051198000153,
+    "adapter_throughput_qps": 8776.40870299426,
+    "total_latency_mean": 326.3926049694419,
+    "total_latency_median": 326.5226208604872,
+    "total_latency_p95": 327.48454618267715,
+    "total_latency_std": 0.7810062515105908,
+    "total_throughput_qps": 3.063794904586223,
+    "ndcg_at_10": 0.5782889742698474,
+    "mrr_at_10": 0.7026666666666667,
+    "recall_at_100": 0.9166111111111109,
+    "retrieval_detailed": {
+      "M2_formal": {
+        "nDCG@10": 0.6615030132240642,
+        "MRR@10": 0.7898333333333334,
+        "Recall@100": 0.9426666666666667
+      },
+      "M2_informal": {
+        "nDCG@10": 0.604131545373461,
+        "MRR@10": 0.7565000000000001,
+        "Recall@100": 0.8977777777777777
+      },
+      "M2_adapted_informal": {
+        "nDCG@10": 0.5782889742698474,
+        "MRR@10": 0.7026666666666667,
+        "Recall@100": 0.9166111111111109
+      },
+      "M2_adapted_formal": {
+        "nDCG@10": 0.6582711706617956,
+        "MRR@10": 0.7668333333333334,
+        "Recall@100": 0.9469444444444443
+      }
+    },
+    "peak_rss_mb": 3553.7890625,
+    "peak_vram_mb": null,
+    "raw_latencies": [
+      326.92188024520874,
+      325.38043428212404,
+      326.4239188283682,
+      327.94490922242403,
+      325.37894137203693,
+      326.62132289260626,
+      325.7573675364256,
+      326.0910287499428,
+      326.7637128010392,
+      326.6425337642431
+    ]
+  }
+]

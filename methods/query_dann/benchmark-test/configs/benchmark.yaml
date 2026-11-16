@@ -1,0 +1,28 @@
+experiment:
+  name: query_dann_efficiency
+  seed: 42
+
+models:
+  encoder: BAAI/bge-m3
+  baseline: true
+  adapter_untrained: true
+  query_dann: true
+
+benchmark:
+  modes: [model_only, full_pipeline]
+  devices: [cpu, cuda]
+  batch_sizes: [1, 8, 32, 64]
+  warmup_steps: 20
+  repetitions: 100
+  top_k: 100
+
+runtime:
+  precision: fp32
+  max_length: 512
+  normalize_embeddings: true
+
+output:
+  directory: reports
+  save_raw_latency: true
+  save_memory_samples: true
+  save_hardware_metadata: true

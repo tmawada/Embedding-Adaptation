@@ -1,0 +1,12 @@
+{
+  "encoder_total": 567754752,
+  "encoder_trainable": 0,
+  "adapter_total": 0,
+  "adapter_trainable": 0,
+  "discriminator_total": 0,
+  "discriminator_trainable": 0,
+  "inference_m0": 567754752,
+  "inference_m1_m2": 567754752,
+  "training_total": 0,
+  "adapter_ratio_pct": 0.0
+}

@@ -1,0 +1,39 @@
+{
+  "hardware": {
+    "cpu_model": "x86_64",
+    "cpu_physical_cores": 16,
+    "cpu_logical_cores": 32,
+    "system_ram_total_gb": 62.70792007446289,
+    "system_ram_available_gb": 59.210628509521484,
+    "cpu_freq_mhz": 2355.59909375,
+    "gpu_name": "NVIDIA GeForce RTX 3090",
+    "gpu_vram_gb": 23.55682373046875,
+    "gpu_driver_version": "580.82.09",
+    "cuda_version": "12.1",
+    "cudnn_version": "8902",
+    "os_name": "Linux",
+    "os_version": "#202212290932~1674066459~20.04~3cd2bf3-Ubuntu SMP PREEMPT_DYNAMI",
+    "kernel_version": "6.0.12-76060012-generic"
+  },
+  "software": {
+    "python_version": "3.8.10",
+    "pytorch_version": "2.1.2+cu121",
+    "torchvision_version": "0.16.2+cu121",
+    "transformers_version": "4.45.2",
+    "accelerate_version": "1.0.1",
+    "numpy_version": "1.24.4",
+    "psutil_version": "7.2.2"
+  },
+  "runtime": {
+    "device": "cpu",
+    "precision": "fp32",
+    "max_length": 512,
+    "batch_size": 1,
+    "torch_threads": 16,
+    "cuda_visible_devices": null,
+    "cuda_benchmark": false,
+    "cuda_deterministic": false
+  },
+  "run_id": "query_dann_efficiency_20261105_180333_d066dd38",
+  "timestamp": "2026-11-05T18:03:35.348089"
+}

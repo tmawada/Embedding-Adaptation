@@ -1,0 +1,22 @@
+{
+  "formal": {
+    "nDCG@10": 0.6166153126882368,
+    "MRR@10": 0.7248180644806943,
+    "Recall@100": 0.939337892019553
+  },
+  "zero_shot_informal": {
+    "nDCG@10": 0.5373065924800559,
+    "MRR@10": 0.6391463448124347,
+    "Recall@100": 0.9002986488713133
+  },
+  "transformed_informal": {
+    "nDCG@10": 0.46731697892268337,
+    "MRR@10": 0.5591880869995057,
+    "Recall@100": 0.8582900807381777
+  },
+  "avg_cosine_similarity": 0.5404152870178223,
+  "gap_closed_pct": 0.0,
+  "split": "test",
+  "transform_type": "whitening_procrustes",
+  "transform_dir": "/home/yd/adapt-dann-retrieve/bge_dann/embed_transform/transforms/whitening_procrustes"
+}

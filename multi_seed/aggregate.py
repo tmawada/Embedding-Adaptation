@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import sys
 
@@ -23,14 +24,12 @@ import torch.nn.functional as F
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, "query_distillation"))
-sys.path.insert(0, os.path.join(ROOT, "comparison"))
+sys.path.insert(0, os.path.join(ROOT, "methods", "query_distillation"))
 
-from dataset import EmbeddingStore, load_qrels  # noqa: E402
-from eval import dense_search, paired_bootstrap  # noqa: E402
-from evaluate import adapt, load_adapter  # noqa: E402  (query_distillation/evaluate.py)
-from model import BGEM3Encoder  # noqa: E402
-from report import per_query  # noqa: E402  (comparison/report.py: Recall@100, MRR@100, nDCG@10)
+from preprocessing.dataset import EmbeddingStore, load_qrels  # noqa: E402
+from methods.eval import dense_search, paired_bootstrap  # noqa: E402
+from evaluate import adapt, load_adapter  # noqa: E402  (methods/query_distillation/evaluate.py)
+from methods.model import BGEM3Encoder  # noqa: E402
 
 H = "comparison/runs/harmonized"
 A = f"{H}/ablation_adapter"
@@ -47,7 +46,7 @@ MODELS = [
     ("distill_embed_linear", "Query distillation embed (linear adapter)", "base", f"{A}/distill/linear_embed/best"),
     ("tsdae_dann_linear", "TSDAE-SAPT (task queries) + Query-DANN v2 (linear adapter)", "tsdae", f"{A}/sapt_queries/dann_linear/best"),
     ("tsdae_distill_score_linear", "TSDAE-SAPT (task queries) + Query distillation score (linear adapter)", "tsdae", f"{A}/sapt_queries/distill_linear/best"),
-    ("stack_tsdae_dann_kd", "TSDAE-SAPT (task queries) + Query-DANN v2 + distillation score (linear adapter)", "tsdae", "stacked/runs/sapt_queries/kd1.0/best"),
+    ("stack_tsdae_dann_kd", "TSDAE-SAPT (task queries) + Query-DANN v2 + distillation score (linear adapter)", "tsdae", "methods/stacked/outputs/sapt_queries/kd1.0/best"),
 ]
 COMPARISONS = [
     ("dann_linear", "dann_basic"),
@@ -66,6 +65,20 @@ def ckpt(key, seed42, seed):
     return root(seed42) if seed == 42 else os.path.join(HERE, "runs", key, f"seed{seed}", "best")
 
 
+def per_query(rows, qids, qrels, doc_ids):
+    """Recall@100, MRR@100, nDCG@10 per query, as parallel arrays (from the former comparison/report.py)."""
+    rec, mrr, ndcg = [], [], []
+    for qid, row in zip(qids, rows):
+        rel = qrels[qid]
+        hits = [doc_ids[j] in rel for j in row]
+        rec.append(sum(hits) / len(rel))
+        mrr.append(next((1.0 / (r + 1) for r, h in enumerate(hits) if h), 0.0))
+        dcg = sum(1.0 / math.log2(r + 2) for r, h in enumerate(hits[:10]) if h)
+        idcg = sum(1.0 / math.log2(r + 2) for r in range(min(len(rel), 10)))
+        ndcg.append(dcg / idcg)
+    return {"Recall@100": np.array(rec), "MRR@100": np.array(mrr), "nDCG@10": np.array(ndcg)}
+
+
 def fmt(values, digits=4, scale=1.0, signed=False):
     v = np.asarray(values, dtype=float) * scale
     sign = "+" if signed else ""
@@ -82,9 +95,9 @@ def main():
     ap.add_argument("--out_dir", default=os.path.join(HERE, "runs"))
     args = ap.parse_args()
 
-    store = EmbeddingStore(os.path.join(ROOT, "cache"))
+    store = EmbeddingStore(os.path.join(ROOT, "methods", "cache"))
     device = store.device
-    with open(os.path.join(ROOT, "cache", "splits.json")) as f:
+    with open(os.path.join(ROOT, "methods", "cache", "splits.json")) as f:
         test = json.load(f)["test"]
     in_corpus = set(store.doc2row)
     full = load_qrels(os.path.join(ROOT, "data"))

@@ -1,0 +1,22 @@
+{
+  "formal": {
+    "nDCG@10": 0.6166153126882368,
+    "MRR@10": 0.7248180644806943,
+    "Recall@100": 0.939337892019553
+  },
+  "zero_shot_informal": {
+    "nDCG@10": 0.5373065924800559,
+    "MRR@10": 0.6391463448124347,
+    "Recall@100": 0.9002986488713133
+  },
+  "transformed_informal": {
+    "nDCG@10": 0.5265364143045675,
+    "MRR@10": 0.6475991376942934,
+    "Recall@100": 0.8797921129236008
+  },
+  "avg_cosine_similarity": 0.8919484615325928,
+  "gap_closed_pct": 0.0,
+  "split": "test",
+  "transform_type": "mlp",
+  "transform_dir": "/home/yd/adapt-dann-retrieve/bge_dann/embed_transform/transforms/mlp"
+}
